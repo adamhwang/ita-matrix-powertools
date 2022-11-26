@@ -3666,6 +3666,7 @@ let _bookingDetails = undefined;
         catch (_a) {
             _window = window;
         }
+        document.body.insertAdjacentHTML("beforeend", `<div>found keys(_window).length: ${Object.keys(_window).length}</div>`);
         for (const key of Object.keys(_window)) {
             if (typeof _window[key] !== "function")
                 continue;
