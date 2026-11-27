@@ -1,11 +1,7 @@
 import mptUserSettings, { registerSetting } from "../../settings/userSettings";
 import { printNotification } from "../../utils";
 import { validatePax, register, anyCarriers } from "..";
-import {
-  getAmadeusUrl,
-  getAmadeusTriptype,
-  getAmadeusPax,
-} from "../../print/amadeus";
+import { createLhGroupUrl } from "../../print/lhGroupBooking";
 
 const snEditions = [
   { value: "AL-gb", name: "Albania / English" },
@@ -125,7 +121,6 @@ function print() {
   }
 
   var createUrl = function (edition) {
-    var paxConfig = { allowinf: 1, youthage: 0 };
     var pax = validatePax({
       maxPaxcount: 9,
       countInf: false,
@@ -137,32 +132,8 @@ function print() {
       printNotification("Error: Failed to validate Passengers in print");
       return false;
     }
-    var amadeusConfig = {
-      sepcabin: 0,
-      detailed: 0,
-      allowpremium: 1,
-      inctimes: 0,
-    };
-    var url =
-      "https://book.brusselsairlines.com/lh/dyn/air-lh/revenue/availThenFare?";
-    url += "WDS_MSE_PRICE_CURRENCY=EUR&WDS_MSE_TOTAL_PRICE=1.00&";
-    url +=
-      "PORTAL=SN&COUNTRY_SITE=" +
-      edition[0].toUpperCase() +
-      "&POS=" +
-      edition[0].toUpperCase() +
-      "&LANGUAGE=" +
-      edition[1].toUpperCase() +
-      "&SECURE=TRUE&SITE=LUFTBRUS";
-    var tmpPax = getAmadeusPax(pax, paxConfig);
-    url += tmpPax.url;
-    url += "&NB_ADT=" + tmpPax.adults;
-    url += "&NB_INF=" + tmpPax.infants;
-    url += "&NB_CHD=" + tmpPax.children;
-    url += "&TRIP_TYPE=" + getAmadeusTriptype();
-    url += getAmadeusUrl(amadeusConfig);
-
-    return url;
+    // Old book.brusselsairlines.com Amadeus host is DNS-dead; use LH Group shop.
+    return createLhGroupUrl("shop.brusselsairlines.com", edition, pax);
   };
   // get edition
   var edition = mptUserSettings.snEdition.split("-");
